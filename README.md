@@ -1,5 +1,56 @@
 # Conteneurs Addok pour Docker
 
+## Note du fork
+
+Les images Docker utilisent un processus de build **multi-stage** et des images finales basées sur des versions **slim**, ce qui réduit leur taille tout en améliorant leur performance et leur portabilité. De plus, la version standalone a été optimisée pour être plus légère et fonctionnelle.
+
+les images sont disponibles sur le docker hub : 
+
+- [communecter/addok](https://hub.docker.com/r/communecter/addok)
+- [communecter/addok-redis](https://hub.docker.com/r/communecter/addok-redis)
+- [communecter/addok-standalone](https://hub.docker.com/r/communecter/addok-standalone)
+- [communecter/addok-importer](https://hub.docker.com/r/communecter/addok-importer)
+
+### Configuration de Redis (Image **addok-redis**)
+
+L'image **`addok-redis`** utilise la version 7.x de Redis. Avec cette version, certaines configurations système peuvent être nécessaires pour garantir un fonctionnement optimal, en particulier si vous rencontrez des erreurs liées à la mémoire.
+
+#### Activer l'overcommit de mémoire
+
+Redis 7.x nécessite que **`vm.overcommit_memory`** soit activé pour éviter des erreurs lors de sauvegardes en arrière-plan ou de réplications. Suivez ces étapes pour configurer votre système :
+
+1. **Modifier la configuration système** :
+   Ouvrez le fichier **`/etc/sysctl.conf`** avec un éditeur de texte (par exemple `nano`) :
+   ```bash
+   sudo nano /etc/sysctl.conf
+   ```
+
+2. **Ajouter la ligne suivante** :
+   ```plaintext
+   vm.overcommit_memory=1
+   ```
+
+3. **Appliquer les changements** :
+   Chargez la configuration modifiée sans redémarrer :
+   ```bash
+   sudo sysctl -p
+   ```
+
+#### Permissions Docker
+
+Pour que Redis fonctionne correctement dans un environnement Docker, vous devez ajouter les permissions suivantes dans votre fichier **`docker-compose.yml`** :
+
+```yaml
+services:
+  addok-redis:
+    image: communecter/addok-redis
+    privileged: true
+    cap_add:
+      - SYS_PTRACE
+```
+  
+---
+
 Ces images permettent de simplifier grandement la mise en place d'une instance [addok](https://github.com/addok/addok) avec les données de références diffusées par la [Base Adresse Nationale](https://adresse.data.gouv.fr).
 
 ## Plateformes
@@ -12,12 +63,12 @@ Les images Docker sont disponibles pour `linux/amd64` et `linux/arm64`. Elles so
 | --- | --- |
 | `redis` | `7.x` |
 | `python` | `3.10.x` |
-| `addok` | `1.0.3` |
+| `addok` | `1.1.2` |
 | `addok-fr` | `1.0.1` |
 | `addok-france` | `1.1.3` |
-| `addok-csv` | `1.0.1` |
+| `addok-csv` | `1.1.0` |
 | `addok-sqlite-store` | `1.0.1` |
-| `gunicorn` | `20.1.0` |
+| `gunicorn` | `23.0.0` |
 
 ## Guides d'installation
 
