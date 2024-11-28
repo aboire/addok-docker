@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  addok-standalone:
+    image: communecter/addok-standalone
+    container_name: addok-standalone
+    privileged: true
+    # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+    # sudo nano /etc/sysctl.conf
+    # vm.overcommit_memory=1
+    # sudo sysctl -p
+    # sysctls:
+    #   vm.overcommit_memory: '1' # Active l'overcommit de mémoire pour Redis
+    ports:
+      - "7878:7878"
+    volumes:
+      - ./logs:/logs
+    environment:
+      WORKERS: 1
+      WORKER_TIMEOUT: 30
+      LOG_QUERIES: 0
+      LOG_NOT_FOUND: 0
+      SLOW_QUERIES: 200
+    cap_add:
+      - SYS_PTRACE
+
+
