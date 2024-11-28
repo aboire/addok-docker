@@ -1,7 +1,8 @@
-version: '2'
+version: '3.8'
 
 services:
   addok-importer:
+    privileged: true
     build:
       context: ../addok-importer
     stdin_open: true
