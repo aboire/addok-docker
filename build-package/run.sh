@@ -14,7 +14,7 @@ echo "> Démarrage de Redis"
 docker-compose -f build-package/docker-compose-build.yml up -d addok-importer-redis
 
 echo "> Importation des données dans Redis"
-gunzip -c data/*.ndjson.gz | docker-compose -f build-package/docker-compose-build.yml run addok-importer batch
+gunzip -c data/*.ndjson.gz | docker-compose -f build-package/docker-compose-build.yml run -T addok-importer batch
 
 echo "> Création des ngrams"
 docker-compose -f build-package/docker-compose-build.yml run addok-importer ngrams
