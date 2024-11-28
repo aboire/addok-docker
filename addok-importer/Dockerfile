@@ -1,6 +1,7 @@
 FROM python:3.10
 
-RUN pip install cython addok==1.0.3 addok-fr==1.0.1 addok-france==1.1.3 addok-sqlite-store==1.0.1
+RUN pip config --user set global.progress_bar off  
+RUN pip install cython addok==1.1.2 addok-fr==1.0.1 addok-france==1.1.3 addok-sqlite-store==1.0.1
 
 COPY addok.conf /etc/addok/
 
