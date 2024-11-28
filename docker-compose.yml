@@ -1,23 +1,39 @@
-version: '2'
+version: '3.8'
 
 services:
   addok:
-    image: etalab/addok
+    image: communecter/addok
+    container_name: addok
     ports:
-    - "7878:7878"
+      - "7878:7878"
     volumes:
-    - ./addok-data/addok.conf:/etc/addok/addok.conf
-    - ./addok-data/addok.db:/data/addok.db
-    - ./logs:/logs
-    links:
-    - addok-redis:redis
+      - ./addok-data/addok.conf:/etc/addok/addok.conf
+      - ./addok-data/addok.db:/data/addok.db
+      - ./logs:/logs
     environment:
       WORKERS: 1
       WORKER_TIMEOUT: 30
-      LOG_QUERIES: 1
-      LOG_NOT_FOUND: 1
+      LOG_QUERIES: 0
+      LOG_NOT_FOUND: 0
       SLOW_QUERIES: 200
+    depends_on:
+      - addok-redis
+    links:
+      - addok-redis:redis
+
   addok-redis:
-    image: etalab/addok-redis
+    image: communecter/addok-redis
+    # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+    # sudo nano /etc/sysctl.conf
+    # vm.overcommit_memory=1
+    # sudo sysctl -p
+    privileged: true
+    # sysctls:
+    #   vm.overcommit_memory: '1' # Active l'overcommit de mémoire pour Redis
+    container_name: addok-redis
     volumes:
-    - ./addok-data/dump.rdb:/data/dump.rdb
+      - ./addok-data/dump.rdb:/data/dump.rdb
+    cap_add:
+      - SYS_PTRACE # Permet les tâches en arrière-plan
+
+
